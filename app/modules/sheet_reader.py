@@ -7,12 +7,15 @@
 import gspread
 from common.constants import CREDENTIALS_FILE_PATH, GOOGLE_SHEET_ID
 
-def read_data():
+def read_records(debug):
     '''
         Reads data from a google sheet.
 
+        Arguments:
+            debug (bool): Denotes whether or not logging is required
+
         Returns:
-            List: A list where each item is a dictionary representing a record from the spreadsheet.
+            List: A list where each item is a dictionary representing a record from the spreadsheet
     '''
 
     gc = gspread.service_account(CREDENTIALS_FILE_PATH)

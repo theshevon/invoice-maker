@@ -13,7 +13,7 @@ Implementation of a script that will:
 >>> python3 app.py 
 ```
 
-The default time period and Google sheets link must be configured in the `constants.py` file. The API key will need to be set as the environment variable "
+The default time period and Google sheets link must be configured in the `constants.py` file. The API key will need to be added as part of a `credentials.json` file in the `app` directory.
 
 ### Available options (b/c I'm an extra bitch):
 
@@ -31,16 +31,29 @@ The default time period and Google sheets link must be configured in the `consta
     - Must be followed by an integer number of weeks
     - Overrides the default time period
     - eg. ```>>> python3 app.py -tp 4```
-
 - `-d` or `--debug`
     - Prints out log statements as the script executes
     - eg. ```>>> python3 app.py -d```
+
+### Effect of setting command line arguments
+sd | ed | tp | Result
+----| ----| ----|-----
+☑️ | ☑️ | ☑️ | Start and end dates provided are used as bounds; Time period is ignored
+☑️ | ☑️ | ☐ | Start and end dates provided are used as bounds; Time period is ignored
+☑️ | ☐ | ☑️ | End Date set to Start Date + Time period
+☑️ | ☐ | ☐ | End Date set to current date
+☐ | ☑️ | ☑️ | Start date set to End date - Time Period
+☐ | ☑️ | ☐ | Start date set to `OLDEST_START_DATE` 
+☐ | ☐ | ☑️ | Start date set to current date - Time period; End date set to current date
+☐ | ☐ | ☐ | Start date set to current date - `DEFAULT_TIME_PERIOD`; End date set to current date
+
 
 ### Defaults:
 
 The following parameters will need to be configured in the `constants.py` file:
 
 - `DEFAULT_TIME_PERIOD`
+- `OLDEST_START_DATE`
 
 ### Environment Variables:
 

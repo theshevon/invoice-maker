@@ -1,1 +1,9 @@
+# files with sensitive data
 credentials.json
+app/assets/
+
+# OS noise
+.DS_Store
+
+# test files
+invoices/
