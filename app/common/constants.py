@@ -6,3 +6,6 @@ GOOGLE_SHEET_ID = "1MJBI2ibiTooLI851VrwnY6S-oNxedgJDiq8ivhAFx5w"
 
 # default time period to generate invoices over (in weeks)
 DEFAULT_TIME_PERIOD = 2
+
+# path to folder that will store the generated PDFs
+PDF_STORAGE_PATH = "../invoices/"

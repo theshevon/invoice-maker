@@ -5,7 +5,7 @@
 """
 
 import gspread
-import util.constants as constants
+from common.constants import CREDENTIALS_FILE_PATH, GOOGLE_SHEET_ID
 
 def read_data():
     '''
@@ -15,8 +15,8 @@ def read_data():
             List: A list where each item is a dictionary representing a record from the spreadsheet.
     '''
 
-    gc = gspread.service_account(filename=constants.CREDENTIALS_FILE_PATH)
-    spreadsheet = gc.open_by_key(constants.GOOGLE_SHEET_ID)
+    gc = gspread.service_account(CREDENTIALS_FILE_PATH)
+    spreadsheet = gc.open_by_key(GOOGLE_SHEET_ID)
     worksheet = spreadsheet.sheet1
 
     return worksheet.get_all_records()
