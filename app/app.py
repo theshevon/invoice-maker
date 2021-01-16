@@ -5,9 +5,11 @@
 """
 
 import util.sheet_reader as sheet_reader
+import util.pdf_generator as pdf_generator
 
 def execute():
     data = sheet_reader.read_data()
+    pdf_generator.generate_file("week2", "test2", str(data))
 
 if __name__ == "__main__":
     execute()
