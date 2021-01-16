@@ -3,7 +3,7 @@ credentials.json
 app/assets/
 
 # OS noise
-.DS_Store
+*.DS_Store
 
 # test files
 invoices/
