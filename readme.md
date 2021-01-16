@@ -60,5 +60,5 @@ The following parameters will need to be configured in the `constants.py` file:
 
 The following parameters will need to be defined as environment variables:
 
-- `SENDER_EMAIL_UN`: The email address of the sending account
-- `SENDER_EMAIL_PW`: The password for the above email
+- `EMAIL_USER`: The email address of the sending account
+- `EMAIL_PASS`: The password for the above email
