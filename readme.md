@@ -31,9 +31,6 @@ The default time period and Google sheets link must be configured in the `consta
     - Must be followed by an integer number of weeks
     - Overrides the default time period
     - eg. ```>>> python3 app.py -tp 4```
-- `-gs` or `--google-sheet`
-    - Overrides the default google-sheet link
-    - eg. ```>>> python3 app.py -gs <google-sheet-link>```
 
 - `-d` or `--debug`
     - Prints out log statements as the script executes
@@ -51,4 +48,3 @@ The following parameters will need to be defined as environment variables:
 
 - `SENDER_EMAIL_UN`: The email address of the sending account
 - `SENDER_EMAIL_PW`: The password for the above email
-- `GOOGLE_SHEETS_API_KEY`: Google Sheets API Key
