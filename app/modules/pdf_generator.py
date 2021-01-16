@@ -6,9 +6,10 @@
 
 import os
 from reportlab.pdfgen.canvas import Canvas
-from common.constants import PDF_STORAGE_PATH, DATE_STR_FORMAT_2
+from common.constants import PDF_STORAGE_PATH
+from modules.util import to_date_string
 
-def generate_files(start_date, end_date, invoice_data, debug):
+def generate_files(start_date, end_date, invoice_data, logger):
     """
         Generates a PDF file that represents an invoice statement.
 
@@ -16,17 +17,18 @@ def generate_files(start_date, end_date, invoice_data, debug):
             start_date     (datetime): Lower bound for record cut off
             end_date       (datetime): Upper bound for record cut off
             invoice_data (Dictionary): Info that needs to be added to the PDF
-            debug              (bool): Denotes whether or not logging is required
+            logger           (Logger): Logger
     """
 
-    subfolder_name = start_date.strftime(DATE_STR_FORMAT_2) + " to " + end_date.strftime(DATE_STR_FORMAT_2) 
+    subfolder_name = to_date_string(start_date) + " to " + to_date_string(end_date)
 
     # make new folder if needed
     try:
         path = f"{ os.getcwd() }/{ PDF_STORAGE_PATH }{ subfolder_name }"
         os.makedirs(path)
+        logger.info(f"Created a new directory at: { path }")
     except FileExistsError:
-        print("File already exists")
+        logger.info(f"Directory already exists at: { path }")
 
     # create PDF for each of the records
     for data in invoice_data:

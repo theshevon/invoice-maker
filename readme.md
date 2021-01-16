@@ -36,6 +36,7 @@ The default time period and Google sheets link must be configured in the `consta
     - eg. ```>>> python3 app.py -d```
 
 ### Effect of setting command line arguments
+
 sd | ed | tp | Result
 ----| ----| ----|-----
 ☑️ | ☑️ | ☑️ | Start and end dates provided are used as bounds; Time period is ignored

@@ -5,6 +5,7 @@
 """
 
 import argparse
+import logging
 from modules.sheet_reader import read_records
 from modules.util import determine_date_bounds
 from modules.invoice_data_generator import generate_data
@@ -40,10 +41,24 @@ def execute(args):
     time_period = args["time_period"]
     debug = args["debug"]
 
-    sheet_records = read_records(debug)
-    start_date, end_date = determine_date_bounds(start_date, end_date, time_period, debug)
-    invoice_data = generate_data(sheet_records, start_date, end_date, debug)
-    generate_files(start_date, end_date, invoice_data, debug)
+    # set logging
+    if debug:
+        logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s: %(message)s")
+    else:
+        logging.basicConfig(level=logging.CRITICAL)
+    logger = logging.getLogger(__name__)
+
+    logger.info("Beginning...")
+    sheet_records = read_records(logger)
+    start_date, end_date = determine_date_bounds(start_date, end_date, time_period, logger)
+    invoice_data = generate_data(sheet_records, start_date, end_date, logger)
+
+    # stop if no records found
+    if not invoice_data:
+        logger.info("No records found within the time bounds. Exiting...")
+        return
+
+    generate_files(start_date, end_date, invoice_data, logger)
 
 if __name__ == "__main__":
     args = init()
