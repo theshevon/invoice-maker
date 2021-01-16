@@ -45,9 +45,9 @@ The following parameters will need to be configured in the `constants.py` file:
 
 - `DEFAULT_TIME_PERIOD`
 
-### Sensitive info
+### Environment Variables:
 
-The following parameters will need to be defined as global constants
+The following parameters will need to be defined as environment variables:
 
 - `SENDER_EMAIL_UN`: The email address of the sending account
 - `SENDER_EMAIL_PW`: The password for the above email
