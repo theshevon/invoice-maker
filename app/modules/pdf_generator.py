@@ -18,6 +18,9 @@ def generate_files(start_date, end_date, invoice_data, logger):
             end_date       (datetime): Upper bound for record cut off
             invoice_data (Dictionary): Info that needs to be added to the PDF
             logger           (Logger): Logger
+
+        Returns:
+            Dictionary: A dictionary containing the information needed to generate and send the emails
     """
 
     subfolder_name = to_date_string(start_date) + " to " + to_date_string(end_date)
@@ -31,12 +34,24 @@ def generate_files(start_date, end_date, invoice_data, logger):
         logger.info(f"Directory already exists at: { path }")
 
     # create PDF for each of the records
+    mail_data = []
     for data in invoice_data:
 
         client_data = data["client_data"]
         services_data = data["services_data"]
         remarks = data["remarks"]
         
-        canvas = Canvas(f"{ PDF_STORAGE_PATH }{ subfolder_name }/{ client_data['name'] }.pdf")
+        path_to_pdf = f"{ PDF_STORAGE_PATH }{ subfolder_name }/{ client_data['name'] }.pdf"
+
+        # create PDF
+        # TODO: replace with injected template
+        canvas = Canvas(path_to_pdf)
         canvas.drawString(72, 72, client_data['name'])
         canvas.save()
+
+        mail_data.append({
+            "client_data": client_data,
+            "path_to_pdf": path_to_pdf
+        })
+
+    return mail_data
