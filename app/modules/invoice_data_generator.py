@@ -18,7 +18,7 @@ def generate_data(sheet_records, start_date, end_date, logger):
             logger       (Logger): Logger
 
         Returns:
-            Dictionary: A dictionary containing the information that needs to be added to the PDF
+            Dictionary: A dictionary containing the info needed to generate and email the invoice PDF
     """
 
     invoice_data = []
