@@ -45,8 +45,9 @@ def determine_date_bounds(start_date, end_date, time_period, logger):
             logger      (Logger): Logger
 
         Returns:
-            start_date     (datetime): Lower bound for record cut off
-            end_date       (datetime): Upper bound for record cut off
+            (datetime, datetime): A 2-tuple where the elements, in order, are:
+                                    - Lower bound for record cut off
+                                    - Upper bound for record cut off
     """
 
     logger.info("Attempting to determine start and end dates based on supplied values: " + \
@@ -76,3 +77,18 @@ def determine_date_bounds(start_date, end_date, time_period, logger):
         logger.error("Error while detemining date bounds!", exc_info=True)
     
     return start_date, end_date
+
+def to_hours(duration):
+    """
+        Converts a time duration into hours.
+
+        Arguments:
+            duration (string): Duration in the format HH:MM:SS 
+        
+        Returns:
+            float: The number of hours
+    """
+
+    hours, minutes, _ = duration.split(':')
+
+    return round(int(hours) + int(minutes) / 60, 2)

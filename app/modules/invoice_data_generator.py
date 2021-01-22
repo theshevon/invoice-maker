@@ -4,8 +4,9 @@
 :purpose: To generate data needed to create invoices.
 """
 
-from modules.util import to_datetime
+from modules.util import to_datetime, to_hours
 from datetime import datetime
+from fields import *
 
 def generate_data(sheet_records, start_date, end_date, logger):
     """
@@ -21,31 +22,30 @@ def generate_data(sheet_records, start_date, end_date, logger):
             Dictionary: A dictionary containing the info needed to generate and email the invoice PDF
     """
 
-    invoice_data = []
+    invoice_data = {}
 
     # filter records to only retain those within time bounds
     sheet_records = [record for record in sheet_records if start_date <= to_datetime(record["Date"]) <= end_date]
 
     for record in sheet_records:
 
-        # only look at approved entries
-        if (record["Approved"].lower() != "true"):
-            logger.info(f"Skipping unapproved record: { record }")
-            continue
-
         logger.info(f"Processing record: { record }")
 
-        client_data = {}
-        client_data["name"] = record["First Name"] + " " + record["Last Name"]
-        client_data["email"] = record["Email"]
+        student_data = {}
+        student_data["name"] = record[NAME_STUDENT]
+        student_data["email"] = record[EMAIL_STUDENT]
 
-        services_data = []
+        class_data = {}
+        class_data["tutor"] = record[NAME_TUTOR]
+        class_data["rate"] = record[RATE_TUTOR]
+        class_data["duration"] = record[DURATION]
+        class_data["cost"] = to_hours(record[DURATION])
+
         remarks = ""
 
         invoice_data.append({
-            "client_data": client_data,
-            "services_data": services_data,
-            "remarks": remarks
+            "student_data": student_data,
+            "class_data": class_data,
         })
 
     return invoice_data
