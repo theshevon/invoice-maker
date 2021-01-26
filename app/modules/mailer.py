@@ -59,7 +59,7 @@ def send_emails(mail_data, use_prod, logger):
             # add fallback in case the recipient has disabled html
             msg.set_content("Test")
 
-             # add html message
+            # add html message
             with open("./assets/email_template.html", "r") as f:
                 html_content = f.read()
                 msg.add_alternative(html_content.format(client_name), subtype="html")
