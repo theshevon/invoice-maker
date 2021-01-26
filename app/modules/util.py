@@ -5,7 +5,7 @@
 """
 
 from datetime import datetime, timedelta
-from common.constants import DEFAULT_TIME_PERIOD, OLDEST_START_DATE, DATE_STR_FORMAT_1, DATE_STR_FORMAT_2
+from common.operational_constants import DEFAULT_TIME_PERIOD, OLDEST_START_DATE, DATE_STR_FORMAT_1, DATE_STR_FORMAT_2
 
 def to_datetime(date_as_str):
     """

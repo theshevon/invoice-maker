@@ -6,7 +6,11 @@
 
 import argparse
 import logging
-from modules.sheet_reader import read_records
+from common.sheets_constants import CLASSES_SHEET_ID, STUDENTS_SHEET_ID, LESSONS_SHEET_ID, ADJUSTMENTS_SHEET_ID, \
+                                    MISC_COSTS_SHEET_ID, CLASSES_PRIMARY_KEY, STUDENTS_PRIMARY_KEY, \
+                                    LESSONS_PRIMARY_KEY, ADJUSTMENTS_PRIMARY_KEY, MISC_COSTS_PRIMARY_KEY, \
+                                    GOOGLE_SHEET_ID
+from modules.AdHocDB import AdHocDB
 from modules.util import determine_date_bounds
 from modules.invoice_data_generator import generate_data
 from modules.pdf_generator import generate_files
@@ -21,6 +25,7 @@ def init():
     """
 
     ap = argparse.ArgumentParser()
+    # TODO: add debugging levels
     ap.add_argument("-d", "--debug", required=False, help="debugger on", action="store_true")
     ap.add_argument("-sd", "--start-date", required=False, help="start date")
     ap.add_argument("-ed", "--end-date", required=False, help="end date")
@@ -58,19 +63,28 @@ def execute(args):
         use_prod = True
 
     logger.info("Beginning...")
-    sheet_records = read_records(logger)
-    start_date, end_date = determine_date_bounds(start_date, end_date, time_period, logger)
-    invoice_data = generate_data(sheet_records, start_date, end_date, logger)
+
+    db = AdHocDB(logger)
+    db.build(GOOGLE_SHEET_ID, [
+        (CLASSES_SHEET_ID, CLASSES_PRIMARY_KEY),
+        (STUDENTS_SHEET_ID, STUDENTS_PRIMARY_KEY),
+        (LESSONS_SHEET_ID, LESSONS_PRIMARY_KEY),
+        (ADJUSTMENTS_SHEET_ID, ADJUSTMENTS_PRIMARY_KEY),
+        (MISC_COSTS_SHEET_ID, MISC_COSTS_PRIMARY_KEY)
+    ])
+
+    # start_date, end_date = determine_date_bounds(start_date, end_date, time_period, logger)
+    # invoice_data = generate_data(sheet_records, start_date, end_date, logger)
 
     # stop if no records found
-    if not invoice_data:
-        logger.info("No records found within the time bounds. Exiting...")
-        return
+    # if not invoice_data:
+    #     logger.info("No records found within the time bounds. Exiting...")
+    #     return
 
-    mail_data = generate_files(start_date, end_date, invoice_data, logger)
-    n_success, n_total = send_emails(mail_data, use_prod, logger)
+    # mail_data = generate_files(start_date, end_date, invoice_data, logger)
+    # n_success, n_total = send_emails(mail_data, use_prod, logger)
 
-    logger.info(f"{ n_success }/{ n_total } emails sent out.")
+    # logger.info(f"{ n_success }/{ n_total } emails sent out.")
     logger.info("Exiting...")
 
 if __name__ == "__main__":

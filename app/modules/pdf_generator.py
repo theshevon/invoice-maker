@@ -6,7 +6,7 @@
 
 import os
 from reportlab.pdfgen.canvas import Canvas
-from common.constants import PDF_STORAGE_PATH
+from common.operational_constants import PDF_STORAGE_PATH
 from modules.util import to_date_string
 
 def generate_files(start_date, end_date, invoice_data, logger):
