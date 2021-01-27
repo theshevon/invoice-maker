@@ -1,28 +1,28 @@
-"""
+'''
 :name: app.py
 :author: Shevon Mendis <shevonmendis@gmail.com>
 :purpose: To generate invoices and email contacts based on info read from a Google Sheet.
-"""
+'''
 
 import argparse
 import logging
-from common.sheets_constants import CLASSES_SHEET_ID, STUDENTS_SHEET_ID, LESSONS_SHEET_ID, ADJUSTMENTS_SHEET_ID, \
-                                    MISC_COSTS_SHEET_ID, CLASSES_PRIMARY_KEY, STUDENTS_PRIMARY_KEY, \
-                                    LESSONS_PRIMARY_KEY, ADJUSTMENTS_PRIMARY_KEY, MISC_COSTS_PRIMARY_KEY, \
-                                    GOOGLE_SHEET_ID
-from modules.AdHocDB import AdHocDB
+from common.gs_constants import CLASSES_SHEET_ID, STUDENTS_SHEET_ID, LESSONS_SHEET_ID, ADJUSTMENTS_SHEET_ID, \
+                                MISC_COSTS_SHEET_ID, CLASSES_PRIMARY_KEY, STUDENTS_PRIMARY_KEY, \
+                                LESSONS_PRIMARY_KEY, ADJUSTMENTS_PRIMARY_KEY, MISC_COSTS_PRIMARY_KEY, \
+                                GOOGLE_SHEET_ID
+from classes.AdHocDB import AdHocDB
 from modules.util import determine_date_bounds
-from modules.invoice_data_generator import generate_data
+from modules.invoicing import generate_invoice_data
 from modules.pdf_generator import generate_files
 from modules.mailer import send_emails
 
 def init():
-    """
+    '''
         Initialises the application.
         
         Returns:
             Dictionary: A map of the command line arguments and their values
-    """
+    '''
 
     ap = argparse.ArgumentParser()
     # TODO: add debugging levels
@@ -35,12 +35,12 @@ def init():
     return vars(ap.parse_args())
 
 def execute(args):
-    """
+    '''
         Executes the application.
 
         Arguments:
             args (Dictionary): A map of the command line arguments and their values
-    """
+    '''
 
     # extract command line argument values
     start_date = args["start_date"]
@@ -64,8 +64,10 @@ def execute(args):
 
     logger.info("Beginning...")
 
-    db = AdHocDB(logger)
-    db.build(GOOGLE_SHEET_ID, [
+    start_date, end_date = determine_date_bounds(logger, start_date, end_date, time_period)
+
+    db = AdHocDB()
+    db.build(logger, GOOGLE_SHEET_ID, [
         (CLASSES_SHEET_ID, CLASSES_PRIMARY_KEY),
         (STUDENTS_SHEET_ID, STUDENTS_PRIMARY_KEY),
         (LESSONS_SHEET_ID, LESSONS_PRIMARY_KEY),
@@ -73,13 +75,12 @@ def execute(args):
         (MISC_COSTS_SHEET_ID, MISC_COSTS_PRIMARY_KEY)
     ])
 
-    # start_date, end_date = determine_date_bounds(start_date, end_date, time_period, logger)
-    # invoice_data = generate_data(sheet_records, start_date, end_date, logger)
+    invoice_data = generate_invoice_data(logger, db, start_date, end_date)
 
     # stop if no records found
-    # if not invoice_data:
-    #     logger.info("No records found within the time bounds. Exiting...")
-    #     return
+    if not invoice_data:
+        logger.info("No records found within the time bounds. Exiting...")
+        return
 
     # mail_data = generate_files(start_date, end_date, invoice_data, logger)
     # n_success, n_total = send_emails(mail_data, use_prod, logger)

@@ -1,15 +1,15 @@
-"""
+'''
 :name: mailer.py
 :author: Shevon Mendis <shevonmendis@gmail.com>
 :purpose: To send out emails to their intended recipients.
-"""
+'''
 
 import os
 import smtplib
 from email.message import EmailMessage
 
 def send_emails(mail_data, use_prod, logger):
-    """
+    '''
         Send invoice emails out to the intended recipients.
 
         Arguments:
@@ -21,7 +21,7 @@ def send_emails(mail_data, use_prod, logger):
             (int , int): A 2-tuple where the elements, in order, represent: 
                             [0]- The number of emails were actually sent out
                             [1]- The number of emails that had to be sent out
-    """
+    '''
 
     username = os.environ.get("EMAIL_USER")
     password = os.environ.get("EMAIL_PASS")
