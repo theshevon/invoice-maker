@@ -1,16 +1,16 @@
-"""
+'''
 :name: pdf_generator.py
 :author: Shevon Mendis <shevonmendis@gmail.com>
 :purpose: To create PDFs based on a template.
-"""
+'''
 
 import os
 from reportlab.pdfgen.canvas import Canvas
-from common.operational_constants import PDF_STORAGE_PATH
+from common.defaults import PDF_STORAGE_PATH
 from modules.util import to_date_string
 
 def generate_files(start_date, end_date, invoice_data, logger):
-    """
+    '''
         Generates a PDF file that represents an invoice statement.
 
         Arguments:
@@ -21,7 +21,7 @@ def generate_files(start_date, end_date, invoice_data, logger):
 
         Returns:
             Dictionary: A dictionary containing the information needed to generate and send the emails
-    """
+    '''
 
     subfolder_name = to_date_string(start_date) + " to " + to_date_string(end_date)
 
