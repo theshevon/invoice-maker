@@ -2,7 +2,16 @@
 CREDENTIALS_FILE_PATH = "credentials.json"
 
 # date string format in google sheet
-DATE_TIME_STR_FORMAT = "%m/%d/%Y %H:%M:%S"
+DATE_TIME_STR_FORMAT = "%d/%m/%Y %H:%M:%S"
+
+# date string format for scripting
+DATE_STR_FORMAT = "%d/%m/%Y"
 
 # date string format for folder names
-DATE_STR_FORMAT = "%d %b %Y"
+DATE_STR_FORMAT_FOLDER = "%d %b %Y"
+
+# invoice category - lessons
+LESSONS = "lessons"
+
+# invoice category - adjustments
+ADJUSTMENTS = "adjustments"

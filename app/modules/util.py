@@ -5,10 +5,11 @@
 '''
 
 from datetime import datetime, timedelta
+from collections import defaultdict as dd
 from common.defaults import DEFAULT_TIME_PERIOD, OLDEST_START_DATE
 from common.op_constants import DATE_TIME_STR_FORMAT, DATE_STR_FORMAT
 
-def to_datetime(date_as_str):
+def to_datetime(date_as_str, format=DATE_TIME_STR_FORMAT):
     '''
         Converts a date from a string to a datetime object.
 
@@ -19,7 +20,7 @@ def to_datetime(date_as_str):
             datetime: The date as a datetime object
     '''
 
-    return datetime.strptime(date_as_str, DATE_TIME_STR_FORMAT)
+    return datetime.strptime(date_as_str, format).date()
 
 
 def to_date_string(date):
@@ -72,18 +73,18 @@ def determine_date_bounds(logger, start_date, end_date, time_period):
     
     try:
         if not (start_date or end_date):
-            end_date = datetime.now()
+            end_date = datetime.now().date()
             if not time_period:
                 time_period = DEFAULT_TIME_PERIOD
             start_date = end_date - timedelta(weeks=int(time_period))
         elif start_date:
-            start_date = to_datetime(start_date)
+            start_date = to_datetime(start_date, DATE_STR_FORMAT)
             if time_period:
                 end_date = start_date + timedelta(weeks=int(time_period))
             else:
-                end_date = datetime.now()
+                end_date = datetime.now().date()
         else:
-            end_date = to_datetime(end_date)
+            end_date = to_datetime(end_date, DATE_STR_FORMAT)
             if time_period:
                 start_date = end_date - timedelta(weeks=int(time_period))
             else:
@@ -138,3 +139,6 @@ def generate_invoice_data(db, start_date, end_date, logger):
         })
 
     return invoice_data
+
+def recursive_dd():
+    return dd(lambda: dd(list))
