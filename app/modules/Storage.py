@@ -5,6 +5,8 @@
 '''
 
 import gspread
+import logging
+
 from common.op_constants import CREDENTIALS_FILE_PATH
 
 class AdHocDB:
@@ -12,7 +14,10 @@ class AdHocDB:
         Represents an ad hoc database created out of records from a Google Sheet.
     '''
 
-    def build(self, logger, gs_id, table_info):
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    def build(self, gs_id, table_info):
         '''
             Reads data from a google sheet and creates an adhoc database out of it.
 
@@ -24,7 +29,7 @@ class AdHocDB:
                                                     [1]- The primary key fields for a record in that worksheet
         '''
 
-        logger.info(f"Attempting to read info from Google Sheet with ID: { gs_id }")
+        self.logger.info(f"Attempting to read info from Google Sheet with ID: { gs_id }")
 
         tables = {}
         try:
@@ -33,9 +38,9 @@ class AdHocDB:
             for table_name, primary_keys in table_info:
                 records = spreadsheet.worksheet(table_name).get_all_records()
                 tables[table_name] = self.__create_adhoc_table(records, primary_keys)
-            logger.info("Succesfully read records.")
+            self.logger.info("Succesfully read records.")
         except:
-            logger.error("Could not read records!", exc_info=True)
+            self.logger.error("Could not read records!", exc_info=True)
         
         self.tables = tables
 

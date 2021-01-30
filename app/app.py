@@ -12,9 +12,9 @@ from common.gs_constants import CLASSES_SHEET_ID, STUDENTS_SHEET_ID, LESSONS_SHE
                                 LESSONS_PRIMARY_KEY, ADJUSTMENTS_PRIMARY_KEY, MISC_COSTS_PRIMARY_KEY, \
                                 GOOGLE_SHEET_ID
 from common.op_constants import DATE_STR_FORMAT
-from classes.AdHocDB import AdHocDB
+from modules.Storage import AdHocDB
+from modules.Invoicing import Invoicer
 from modules.util import determine_date_bounds, to_datetime
-from modules.invoicing import generate_invoice_data
 from modules.pdf_generator import generate_files
 from modules.mailer import send_emails
 
@@ -56,7 +56,7 @@ def execute(args):
     if debug:
         logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s]: %(message)s")
     else:
-        logging.basicConfig(level=logging.ERROR)
+        logging.basicConfig(level=logging.ERROR, format="%(asctime)s [%(levelname)s]: %(message)s")
     logger = logging.getLogger(__name__)
 
     # determine mail server type
@@ -81,7 +81,7 @@ def execute(args):
         adjustments_date = to_datetime(adjustments_date, DATE_STR_FORMAT)
 
     db = AdHocDB()
-    db.build(logger, GOOGLE_SHEET_ID, [
+    db.build(GOOGLE_SHEET_ID, [
         (CLASSES_SHEET_ID, CLASSES_PRIMARY_KEY),
         (STUDENTS_SHEET_ID, STUDENTS_PRIMARY_KEY),
         (LESSONS_SHEET_ID, LESSONS_PRIMARY_KEY),
@@ -89,12 +89,8 @@ def execute(args):
         (MISC_COSTS_SHEET_ID, MISC_COSTS_PRIMARY_KEY)
     ])
 
-    invoice_data = generate_invoice_data(logger, db, start_date, end_date, adjustments_date)
-
-    # stop if no records found
-    if not invoice_data:
-        logger.info("No records found within the time bounds. Exiting...")
-        return
+    invoicer = Invoicer()
+    invoicer.generate_and_mail_invoices(db, start_date, end_date, adjustments_date)
 
     # mail_data = generate_files(start_date, end_date, invoice_data, logger)
     # n_success, n_total = send_emails(mail_data, use_prod, logger)
