@@ -4,11 +4,15 @@
 :purpose: To generate data needed to create invoices.
 '''
 
-from modules.util import to_datetime, get_duration_in_hours, recursive_dd
+import os
+from modules.util import to_datetime, get_duration_in_hours, recursive_dd, to_date_string
 from datetime import datetime
 import logging
 from common.gs_constants import *
 from common.op_constants import LESSONS, ADJUSTMENTS, DATE_STR_FORMAT
+from reportlab.pdfgen.canvas import Canvas
+from common.defaults import PDF_STORAGE_PATH
+from modules.PDFGenerator import PDFGenerator
 
 class Invoicer:
 
@@ -24,14 +28,19 @@ class Invoicer:
 
         if not invoice_data:
             self.logger.info("No records found within the time bounds. Exiting...")
-            return
 
+        subfolder_name = to_date_string(start_date, "%d %b %Y") + " to " + to_date_string(end_date, "%d %b %Y")
+        pdf_generator = PDFGenerator(subfolder_name)
+        num = 1
+        for student, data in invoice_data.items():
+            pdf_generator.build(num, student, data)
+            num += 1
+    
     def generate_invoice_data(self, db, start_date, end_date, adjustments_date):
         '''
             Converts data read from a google sheet into a format that can be utilised when generating the invoices.
 
             Arguments:
-                logger         (Logger): Logger
                 db            (AdHocDB): Database
                 start_date       (date): Lower bound (inclusive) for record cut off
                 end_date         (date): Upper bound (inclusive) for record cut off
@@ -68,6 +77,7 @@ class Invoicer:
             for student in students:
                 invoice_data[student][LESSONS].append({
                     "tutor": tutor,
+                    "subject": subject,
                     "date": date,
                     "duration": duration,
                     "cost": cost
@@ -99,4 +109,8 @@ class Invoicer:
         return [record for (key, record) in all_class_records if start_date <= to_datetime(record[CLASSES_DATE]) <= end_date]
 
     def mail_invoices(self, db, invoice_data):
+        pass
+
+    
+    def mail_invoice(self):
         pass
