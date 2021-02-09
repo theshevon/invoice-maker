@@ -7,16 +7,11 @@
 import argparse
 import logging
 from datetime import datetime
-from common.gs_constants import CLASSES_SHEET_ID, STUDENTS_SHEET_ID, LESSONS_SHEET_ID, ADJUSTMENTS_SHEET_ID, \
-                                MISC_COSTS_SHEET_ID, CLASSES_PRIMARY_KEY, STUDENTS_PRIMARY_KEY, \
-                                LESSONS_PRIMARY_KEY, ADJUSTMENTS_PRIMARY_KEY, MISC_COSTS_PRIMARY_KEY, \
-                                GOOGLE_SHEET_ID
+from common.gs_constants import *
 from common.op_constants import DATE_STR_FORMAT
-from classes.AdHocDB import AdHocDB
+from modules.Storage import AdHocDB
+from modules.Invoicing import Invoicer
 from modules.util import determine_date_bounds, to_datetime
-from modules.invoicing import generate_invoice_data
-from modules.pdf_generator import generate_files
-from modules.mailer import send_emails
 
 def init():
     '''
@@ -56,7 +51,7 @@ def execute(args):
     if debug:
         logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s]: %(message)s")
     else:
-        logging.basicConfig(level=logging.ERROR)
+        logging.basicConfig(level=logging.ERROR, format="%(asctime)s [%(levelname)s]: %(message)s")
     logger = logging.getLogger(__name__)
 
     # determine mail server type
@@ -81,22 +76,18 @@ def execute(args):
         adjustments_date = to_datetime(adjustments_date, DATE_STR_FORMAT)
 
     db = AdHocDB()
-    db.build(logger, GOOGLE_SHEET_ID, [
-        (CLASSES_SHEET_ID, CLASSES_PRIMARY_KEY),
-        (STUDENTS_SHEET_ID, STUDENTS_PRIMARY_KEY),
-        (LESSONS_SHEET_ID, LESSONS_PRIMARY_KEY),
-        (ADJUSTMENTS_SHEET_ID, ADJUSTMENTS_PRIMARY_KEY),
-        (MISC_COSTS_SHEET_ID, MISC_COSTS_PRIMARY_KEY)
+    db.build(GOOGLE_SHEET_ID, [
+        (LESSON_SHEET_ID, LESSON_SHEET_PRIMARY_KEY),
+        (STUDENT_SHEET_ID, STUDENT_SHEET_PRIMARY_KEY),
+        (INDV_RATE_SHEET_ID, INDV_RATE_SHEET_PRIMARY_KEY),
+        (GRP_RATE_SHEET_ID, GRP_RATE_SHEET_PRIMARY_KEY),
+        (ADJUSTMENT_SHEET_ID, ADJUSTMENT_SHEET_PRIMARY_KEY),
+        (MISC_SHEET_ID, MISC_SHEET_PRIMARY_KEY)
     ])
 
-    invoice_data = generate_invoice_data(logger, db, start_date, end_date, adjustments_date)
+    invoicer = Invoicer()
+    invoicer.generate_and_mail_invoices(db, start_date, end_date, adjustments_date)
 
-    # stop if no records found
-    if not invoice_data:
-        logger.info("No records found within the time bounds. Exiting...")
-        return
-
-    # mail_data = generate_files(start_date, end_date, invoice_data, logger)
     # n_success, n_total = send_emails(mail_data, use_prod, logger)
 
     # logger.info(f"{ n_success }/{ n_total } emails sent out.")

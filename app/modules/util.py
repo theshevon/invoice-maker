@@ -7,7 +7,7 @@
 from datetime import datetime, timedelta
 from collections import defaultdict as dd
 from common.defaults import DEFAULT_TIME_PERIOD, OLDEST_START_DATE
-from common.op_constants import DATE_TIME_STR_FORMAT, DATE_STR_FORMAT
+from common.op_constants import DATE_TIME_STR_FORMAT, DATE_STR_FORMAT, DATE_TIME_STR_FORMAT_INVOICE
 
 def to_datetime(date_as_str, format=DATE_TIME_STR_FORMAT):
     '''
@@ -22,19 +22,26 @@ def to_datetime(date_as_str, format=DATE_TIME_STR_FORMAT):
 
     return datetime.strptime(date_as_str, format).date()
 
-
-def to_date_string(date):
+def to_date_string(date, format=DATE_STR_FORMAT):
     '''
         Converts a date object into a string.
 
         Arguments:
-            date (datetime): The data as a date object
+            date (datetime): The date as a date object
         
         Returns:
             string: The date as a string
     '''
 
-    return date.strftime(DATE_STR_FORMAT)
+    return date.strftime(format)
+
+def get_formatted_date_time(datetime_as_str, format=DATE_TIME_STR_FORMAT_INVOICE):
+    '''
+    '''
+
+    datetime = to_datetime(datetime_as_str)
+    
+    return datetime.strftime(format)
 
 def get_duration_in_hours(duration):
     '''
@@ -50,6 +57,13 @@ def get_duration_in_hours(duration):
     hours, mins, _ = duration.split(':')
     
     return round(int(hours) + int(mins) / 60, 2)
+
+def get_formatted_duration(duration):
+    '''
+    '''
+
+    hours, mins, _ = duration.split(":")
+    return f"{ int(hours) }H { mins }M"
 
 
 def determine_date_bounds(logger, start_date, end_date, time_period):
@@ -95,50 +109,6 @@ def determine_date_bounds(logger, start_date, end_date, time_period):
         logger.error("Error while detemining date bounds!", exc_info=True)
     
     return start_date, end_date
-
-
-def generate_invoice_data(db, start_date, end_date, logger):
-    '''
-        Converts data read from a google sheet into a format that can be utilised when generating the invoices.
-
-        Arguments:
-            db          (AdHocDB): DB of records
-            start_date (datetime): Lower bound for record cut off
-            end_date   (datetime): Upper bound for record cut off
-            logger       (Logger): Logger
-
-        Returns:
-            Dictionary: A dictionary containing the info needed to generate and email the invoice PDF
-    '''
-
-    invoice_data = []
-
-    # filter records to only retain those within time bounds
-    sheet_records = [record for record in sheet_records if start_date <= to_datetime(record["Date"]) <= end_date]
-
-    for record in sheet_records:
-
-        # only look at approved entries
-        if (record["Approved"].lower() != "true"):
-            logger.info(f"Skipping unapproved record: { record }")
-            continue
-
-        logger.info(f"Processing record: { record }")
-
-        client_data = {}
-        client_data["name"] = record["First Name"] + " " + record["Last Name"]
-        client_data["email"] = record["Email"]
-
-        services_data = []
-        remarks = ""
-
-        invoice_data.append({
-            "client_data": client_data,
-            "services_data": services_data,
-            "remarks": remarks
-        })
-
-    return invoice_data
 
 def recursive_dd():
     return dd(lambda: dd(list))
