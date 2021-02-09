@@ -3,6 +3,7 @@ import logging
 import asyncio
 from pyppeteer import launch
 from datetime import datetime
+from common.gs_constants import *
 from common.defaults import PDF_STORAGE_PATH
 from common.op_constants import INVOICE_AS_HTML, LESSONS, ADJUSTMENTS
 from modules.util import to_datetime, get_formatted_date_time, get_formatted_duration, to_date_string
@@ -59,14 +60,22 @@ class PDFGenerator:
         for adjustment in invoice_info[ADJUSTMENTS]:
             amount = adjustment["amount"]
             reason = adjustment["reason"]
-            notes += self.__NOTE_TEMPLATE(reason) + "\n"
-            adjustments_total += amount
+            notes += self.__NOTE_TEMPLATE.format(reason) + "\n"
+
+            if adjustment["type"] == ADJUSTMENT_TYPE__DEB:
+                adjustments_total += amount
+            else:
+                adjustments_total -= amount
 
         total = subtotal + adjustments_total
+
+        adjustments_total = self.__get_formatted_cost(adjustments_total)
+        total = self.__get_formatted_cost(total)
 
         # fill up invoice
         invoice_no = f"{invoice_no:06}"
         curr_date = to_date_string(datetime.now().date(), "%d %b %Y")
+        adjustments_total
         invoice = self.__PDF_TEMPLATE.format("../assets/pdf/", invoice_no, curr_date, curr_date, student, billing_rows, subtotal, adjustments_total, total, notes, True)
         
         # make temp invoice as html
@@ -74,14 +83,21 @@ class PDFGenerator:
             f.write(invoice)
 
         path_to_pdf = f"{ self.path_to_subfolder }/#{ invoice_no }.pdf"
-        asyncio.get_event_loop().run_until_complete(self.makePdf(path_to_pdf))
+        asyncio.get_event_loop().run_until_complete(self.__makePdf(path_to_pdf))
         
         # remove temp file
         os.remove(INVOICE_AS_HTML)
 
         return path_to_pdf
     
-    async def makePdf(self, path_to_pdf):
+    def __get_formatted_cost(self, cost):
+
+        if (cost >= 0):
+            return "${:.2f}".format(cost)
+        else:
+            return "-${:.2f}".format(abs(cost))
+
+    async def __makePdf(self, path_to_pdf):
         browser = await launch()
         page = await browser.newPage()
         await page.goto("file:///Users/mendis/Desktop/Mendis/Projects/invoice-maker/app/modules/invoice.html")

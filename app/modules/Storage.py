@@ -22,7 +22,6 @@ class AdHocDB:
             Reads data from a google sheet and creates an adhoc database out of it.
 
             Arguments:
-                logger       (Logger): Logger
                 gs_id        (String): The ID of the Google Sheet from which the DB info will be sourced.
                 table_info     (List): A list of 2 tuples, where each tuple contains, in order:
                                                     [0]- The name of a worksheet (which will be the name of the table)
@@ -41,7 +40,7 @@ class AdHocDB:
             self.logger.info("Succesfully read records.")
         except:
             self.logger.error("Could not read records!", exc_info=True)
-        
+
         self.tables = tables
 
     def __create_adhoc_table(self, records, primary_keys):
@@ -70,7 +69,7 @@ class AdHocDB:
 
         return self.tables[table_name]
         
-    def queryTable(self, table_name, key):
+    def queryTable(self, table_name, key, field):
         '''
             Fetches a record from a table in the database.
 
@@ -82,4 +81,7 @@ class AdHocDB:
                 Dictionary: The required record
         '''
 
-        return self.tables[table_name][key]
+        return self.tables[table_name][key][field] if field else self.tables[table_name][key]
+
+    def validateTable(self):
+        pass

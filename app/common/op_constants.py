@@ -21,3 +21,5 @@ ADJUSTMENTS = "adjustments"
 
 # invoice as html
 INVOICE_AS_HTML = "modules/invoice.html"
+
+MAX_STUDENTS = 4

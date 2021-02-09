@@ -27,7 +27,7 @@ def to_date_string(date, format=DATE_STR_FORMAT):
         Converts a date object into a string.
 
         Arguments:
-            date (datetime): The data as a date object
+            date (datetime): The date as a date object
         
         Returns:
             string: The date as a string
@@ -35,13 +35,13 @@ def to_date_string(date, format=DATE_STR_FORMAT):
 
     return date.strftime(format)
 
-def get_formatted_date_time(datetime_as_str):
+def get_formatted_date_time(datetime_as_str, format=DATE_TIME_STR_FORMAT_INVOICE):
     '''
     '''
 
     datetime = to_datetime(datetime_as_str)
     
-    return datetime.strftime(DATE_TIME_STR_FORMAT_INVOICE)
+    return datetime.strftime(format)
 
 def get_duration_in_hours(duration):
     '''
