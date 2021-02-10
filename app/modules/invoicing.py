@@ -24,7 +24,7 @@ class Invoicer:
 
         self.logger = logging.getLogger(__name__)
 
-    def generate_and_mail_invoices(self, db, start_date, end_date, adjustments_date):
+    def generate_and_mail_invoices(self, db, invoice_no, start_date, end_date, adjustments_date):
         '''
         '''
         
@@ -35,10 +35,9 @@ class Invoicer:
 
         subfolder_name = SUBFOLDER_NAME_FORMAT.format(to_date_string(start_date, "%d %b %Y"), to_date_string(end_date, "%d %b %Y"))
         pdf_generator = PDFGenerator(subfolder_name)
-        num = 1
         for student, data in invoice_data.items():
-            pdf_generator.build(num, student, data)
-            num += 1
+            pdf_generator.build(invoice_no, student, data)
+            invoice_no += 1
     
     def generate_invoice_data(self, db, start_date, end_date, adjustments_date):
         '''

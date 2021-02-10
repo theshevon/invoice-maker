@@ -23,6 +23,7 @@ def init():
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--debug", required=False, help="debugger on", action="store_true")
+    ap.add_argument("-in", "--invoice-no", required=True, help="Starting Invoice #")
     ap.add_argument("-sd", "--start-date", required=False, help="start date (dd/mm/yy)")
     ap.add_argument("-ed", "--end-date", required=False, help="end date (dd/mm/yy)")
     ap.add_argument("-tp", "--time-period", required=False, help="time period")
@@ -40,6 +41,7 @@ def execute(args):
     '''
 
     # extract command line argument values
+    invoice_no = int(args["invoice_no"])
     start_date = args["start_date"]
     end_date = args["end_date"]
     time_period = args["time_period"]
@@ -86,7 +88,7 @@ def execute(args):
     ])
 
     invoicer = Invoicer()
-    invoicer.generate_and_mail_invoices(db, start_date, end_date, adjustments_date)
+    invoicer.generate_and_mail_invoices(db, invoice_no, start_date, end_date, adjustments_date)
 
     # n_success, n_total = send_emails(mail_data, use_prod, logger)
 
