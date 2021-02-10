@@ -24,7 +24,7 @@ class Invoicer:
 
         self.logger = logging.getLogger(__name__)
 
-    def generate_and_mail_invoices(self, db, invoice_no, start_date, end_date, adjustments_date):
+    def generate_and_mail_invoices(self, db, invoice_no, start_date, end_date, adjustments_date, files_only):
         '''
         '''
         
@@ -36,8 +36,16 @@ class Invoicer:
         subfolder_name = SUBFOLDER_NAME_FORMAT.format(to_date_string(start_date, "%d %b %Y"), to_date_string(end_date, "%d %b %Y"))
         pdf_generator = PDFGenerator(subfolder_name)
         for student, data in invoice_data.items():
-            pdf_generator.build(invoice_no, student, data)
+            path_to_pdf = pdf_generator.build(invoice_no, student, data)
+            if not files_only:
+                self.__mail_invoices(db, invoice_data)
             invoice_no += 1
+
+        if files_only:
+            return
+
+        
+
     
     def generate_invoice_data(self, db, start_date, end_date, adjustments_date):
         '''
@@ -65,6 +73,7 @@ class Invoicer:
             subject = lesson_record[LESSON_SUBJECT]
             date = lesson_record[LESSON_DATE]
             duration = lesson_record[LESSON_DURATION]
+
             students_present = self.__get_students(lesson_record[LESSON_STUDENTS_PRESENT])
             students_absent = self.__get_students(lesson_record[LESSON_STUDENTS_ABSENT])
             n_students = (len(students_present) + len(students_absent)) 
@@ -139,8 +148,8 @@ class Invoicer:
             "reason": LATE_CANCELLATION_MSG.format(subject, tutor, date, amount)
         })
 
-    def mail_invoices(self, db, invoice_data):
+    def __mail_invoices(self, db, invoice_data):
         pass
 
-    def mail_invoice(self):
+    def __mail_invoice(self):
         pass

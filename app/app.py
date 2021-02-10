@@ -23,12 +23,13 @@ def init():
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--debug", required=False, help="debugger on", action="store_true")
-    ap.add_argument("-in", "--invoice-no", required=True, help="Starting Invoice #")
+    ap.add_argument("-in", "--invoice-no", required=True, help="starting Invoice #")
     ap.add_argument("-sd", "--start-date", required=False, help="start date (dd/mm/yy)")
     ap.add_argument("-ed", "--end-date", required=False, help="end date (dd/mm/yy)")
     ap.add_argument("-tp", "--time-period", required=False, help="time period")
     ap.add_argument("-ad", "--adjustments-date", required=False, help="date as of which adjustments are still outstanding (dd/mm/yy)")
     ap.add_argument("-ms", "--mail-server", required=False, help="mail server type (p: production; t: test)", choices=['p', 't'])
+    ap.add_argument("-fo", "--files-only", required=False, help="only generate files (no emailing)", action="store_true")
 
     return vars(ap.parse_args())
 
@@ -48,6 +49,7 @@ def execute(args):
     debug = args["debug"]
     use_prod = args["mail_server"]
     adjustments_date = args["adjustments_date"]
+    files_only = args["files_only"]
 
     # set logging
     if debug:
@@ -88,7 +90,7 @@ def execute(args):
     ])
 
     invoicer = Invoicer()
-    invoicer.generate_and_mail_invoices(db, invoice_no, start_date, end_date, adjustments_date)
+    invoicer.generate_and_mail_invoices(db, invoice_no, start_date, end_date, adjustments_date, files_only)
 
     # n_success, n_total = send_emails(mail_data, use_prod, logger)
 
