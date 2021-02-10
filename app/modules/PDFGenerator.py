@@ -1,3 +1,9 @@
+'''
+:name: PDFGenerator.py
+:author: Shevon Mendis <shevonmendis@gmail.com>
+:purpose: To dynamically generate a PDF. 
+'''
+
 import os
 import logging
 import asyncio
@@ -5,9 +11,9 @@ import pathlib
 
 from pyppeteer import launch
 from common.inv_constants import *
+from common.date_formats import DATE_TIME_STR_FORMAT_STANDARD, DATE_TIME_STR_FORMAT_SPECIAL
 from common.gs_constants import ADJUSTMENT_TYPE__DEB
 from common.defaults import PDF_STORAGE_PATH
-from common.date_formats import DATE_TIME_STR_FORMAT_STANDARD, DATE_TIME_STR_FORMAT_SPECIAL
 from modules.util import get_date, get_formatted_date_time, get_formatted_duration
 
 PATH_TO_LOGO = "../assets/pdf/"
