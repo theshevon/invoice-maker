@@ -1,12 +1,16 @@
 import os
 import logging
 import asyncio
+import pathlib
+
 from pyppeteer import launch
-from datetime import datetime
-from common.gs_constants import *
+from common.inv_constants import *
+from common.gs_constants import ADJUSTMENT_TYPE__DEB
 from common.defaults import PDF_STORAGE_PATH
-from common.op_constants import INVOICE_AS_HTML, LESSONS, ADJUSTMENTS
-from modules.util import to_datetime, get_formatted_date_time, get_formatted_duration, to_date_string
+from common.date_formats import DATE_TIME_STR_FORMAT_STANDARD, DATE_TIME_STR_FORMAT_SPECIAL
+from modules.util import get_date, get_formatted_date_time, get_formatted_duration
+
+PATH_TO_LOGO = "../assets/pdf/"
 
 class PDFGenerator:
 
@@ -18,10 +22,10 @@ class PDFGenerator:
             self.__PDF_TEMPLATE = f.read()
 
         with open("./assets/pdf/billing_row_template.html") as f:
-            self.__BILLING_ROWTEMPLATE = f.read()
+            self.__BILLING_ROW_TEMPLATE = f.read()
 
-        with open("./assets/pdf/note_template.html") as f:
-            self.__NOTE_TEMPLATE = f.read()
+        with open("./assets/pdf/adjustment_template.html") as f:
+            self.__ADJUSTMENT_TEMPLATE = f.read()
 
         # make new folder if needed
         try:
@@ -31,41 +35,44 @@ class PDFGenerator:
         except FileExistsError:
             self.logger.info(f"Directory already exists at: { self.path_to_subfolder }")
 
-    def build(self, invoice_no, student, invoice_info):
+    def build(self, curr_date, invoice_no, student, invoice_info):
         '''
-            Builds a pdf
+            Builds a pdf.
 
             Arguments:
-                invoice_info (Dictionary):
+                curr_date          (date): The current date
+                invoice_no          (int): The invoice no. for the PDF that gets generated
+                student          (string): The name of the student who the invoice is for
+                invoice_info (Dictionary): A dictionary containing all the info needed for the PDF generation
             
             Returns:
-                String: Path to the pdf that was generated.
+                string: Path to the PDF that was generated.
         '''
 
         # fill up billing row info
         billing_rows = ""
         subtotal = 0
-        for lesson in invoice_info[LESSONS]:
-            tutor = lesson["tutor"]
-            subject = lesson["subject"]
-            date = get_formatted_date_time(lesson["date"])
-            duration = get_formatted_duration(lesson["duration"])
-            cost = lesson["cost"]
-            billing_rows += self.__BILLING_ROWTEMPLATE.format(subject, tutor, date, duration, cost) + "\n"
+        for lesson in invoice_info[INV_LESSONS]:
+            tutor = lesson[INV_TUTOR]
+            subject = lesson[INV_SUBJECT]
+            date = get_formatted_date_time(lesson[INV_DATE], DATE_TIME_STR_FORMAT_STANDARD, DATE_TIME_STR_FORMAT_SPECIAL)
+            duration = get_formatted_duration(lesson[INV_DURATION])
+            cost = lesson[INV_COST]
+            billing_rows += self.__BILLING_ROW_TEMPLATE.format(subject, tutor, date, duration, cost) + "\n"
             subtotal += cost
 
         # fill up notes
         notes = ""
         adjustments_total = 0
-        for adjustment in invoice_info[ADJUSTMENTS]:
-            amount = adjustment["amount"]
-            reason = adjustment["reason"]
-            notes += self.__NOTE_TEMPLATE.format(reason) + "\n"
+        for adjustment in invoice_info[INV_ADJUSTMENTS]:
+            cost = adjustment[INV_COST]
+            reason = adjustment[INV_REASON]
+            notes += self.__ADJUSTMENT_TEMPLATE.format(reason) + "\n"
 
-            if adjustment["type"] == ADJUSTMENT_TYPE__DEB:
-                adjustments_total += amount
+            if adjustment[INV_TYPE] == ADJUSTMENT_TYPE__DEB:
+                adjustments_total += cost
             else:
-                adjustments_total -= amount
+                adjustments_total -= cost
 
         total = subtotal + adjustments_total
 
@@ -74,9 +81,8 @@ class PDFGenerator:
 
         # fill up invoice
         invoice_no = f"{invoice_no:06}"
-        curr_date = to_date_string(datetime.now().date(), "%d %b %Y")
         adjustments_total
-        invoice = self.__PDF_TEMPLATE.format("../assets/pdf/", invoice_no, curr_date, curr_date, student, billing_rows, subtotal, adjustments_total, total, notes, True)
+        invoice = self.__PDF_TEMPLATE.format(PATH_TO_LOGO, invoice_no, curr_date, curr_date, student, billing_rows, subtotal, adjustments_total, total, notes, True)
         
         # make temp invoice as html
         with open(INVOICE_AS_HTML, "w") as f:
@@ -91,6 +97,13 @@ class PDFGenerator:
         return path_to_pdf
     
     def __get_formatted_cost(self, cost):
+        '''
+            Arguments:
+                cost (float): 
+            
+            Returns:
+                The formatted cost (+/- sign & currency symbol)
+        '''
 
         if (cost >= 0):
             return "${:.2f}".format(cost)
@@ -98,8 +111,15 @@ class PDFGenerator:
             return "-${:.2f}".format(abs(cost))
 
     async def __makePdf(self, path_to_pdf):
+        '''
+            Generates a PDF at a specified location.
+
+            Arguments:
+                path_to_pdf (string): Path to the PDF that should be generates.
+        '''
+
         browser = await launch()
         page = await browser.newPage()
-        await page.goto("file:///Users/mendis/Desktop/Mendis/Projects/invoice-maker/app/modules/invoice.html")
+        await page.goto(f"file://{ pathlib.Path().absolute() }/{ INVOICE_AS_HTML }")
         await page.pdf(options={"format": "A4", "printBackground": True, "path": path_to_pdf })
         await browser.close()

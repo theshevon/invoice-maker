@@ -1,3 +1,9 @@
+'''
+:name: defaults.py
+:author: Shevon Mendis <shevonmendis@gmail.com>
+:purpose: To store all the field names/ keys for the sheets in the Google sheet.
+'''
+
 # ID of google sheet being accessed
 GOOGLE_SHEET_ID = "1v1Leb35stPMgGd6Ut9KA2_8Aa0fj0t6QlKf1lPjWi1g" 
 
@@ -68,7 +74,7 @@ ADJUSTMENT_TYPE__DEB = "Debit"
 
 ADJUSTMENT_STUDENT = "Student"
 
-ADJUSTMENT_AMOUNT = "Amount"
+ADJUSTMENT_COST = "Cost"
 
 ADJUSTMENT_REASON = "Reason"
 

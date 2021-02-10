@@ -6,12 +6,16 @@
 
 import argparse
 import logging
+
 from datetime import datetime
-from common.gs_constants import *
-from common.op_constants import DATE_STR_FORMAT
-from modules.Storage import AdHocDB
+from common.gs_constants import GOOGLE_SHEET_ID, LESSON_SHEET_ID, LESSON_SHEET_PRIMARY_KEY, STUDENT_SHEET_ID, \
+                                STUDENT_SHEET_PRIMARY_KEY, INDV_RATE_SHEET_ID, INDV_RATE_SHEET_PRIMARY_KEY, \
+                                GRP_RATE_SHEET_ID, GRP_RATE_SHEET_PRIMARY_KEY, ADJUSTMENT_SHEET_ID, \
+                                ADJUSTMENT_SHEET_PRIMARY_KEY, MISC_SHEET_ID, MISC_SHEET_PRIMARY_KEY
+from common.date_formats import DATE_STR_FORMAT_STANDARD
 from modules.Invoicing import Invoicer
-from modules.util import determine_date_bounds, to_datetime
+from modules.Storage import AdHocDB
+from modules.util import determine_date_bounds, get_date
 
 def init():
     '''
@@ -59,25 +63,24 @@ def execute(args):
     logger = logging.getLogger(__name__)
 
     # determine mail server type
+    use_prod = True
     if use_prod:
         use_prod = True if use_prod == 'p' else False
-    else:
-        use_prod = True
 
     logger.info("Beginning...")
 
-    start_date, end_date = determine_date_bounds(logger, start_date, end_date, time_period)
-
     curr_date = datetime.now().date()
+    start_date, end_date = determine_date_bounds(logger, curr_date, start_date, end_date, time_period)
+
     if end_date < curr_date and not adjustments_date:
         logger.error("The adjustments_date must be supplied when the end_date is set to a date prior to the current date")
         logger.info("Exiting...")
         return 
-    elif not adjustments_date or to_datetime(adjustments_date, DATE_STR_FORMAT) > curr_date:
+    elif not adjustments_date or get_date(adjustments_date, DATE_STR_FORMAT_STANDARD) > curr_date:
         logger.info(f"Resetting adjustments date from { adjustments_date } to { curr_date }")
         adjustments_date = curr_date
     else:
-        adjustments_date = to_datetime(adjustments_date, DATE_STR_FORMAT)
+        adjustments_date = get_date(adjustments_date, DATE_STR_FORMAT_STANDARD)
 
     db = AdHocDB()
     db.build(GOOGLE_SHEET_ID, [
@@ -90,7 +93,7 @@ def execute(args):
     ])
 
     invoicer = Invoicer()
-    invoicer.generate_and_mail_invoices(db, invoice_no, start_date, end_date, adjustments_date, files_only)
+    invoicer.generate_and_email_invoices(db, invoice_no, curr_date, start_date, end_date, adjustments_date, files_only)
 
     # n_success, n_total = send_emails(mail_data, use_prod, logger)
 
