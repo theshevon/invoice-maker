@@ -9,13 +9,12 @@ import gspread
 import logging
 
 from common.defaults import CREDENTIALS_FILE_PATH
+from modules.util import log
 
 class AdHocDB:
-    '''
-        Represents an ad hoc database created out of records from a Google Sheet.
-    '''
 
     def __init__(self):
+        
         self.logger = logging.getLogger(__name__)
         self.tables = {}
 
@@ -30,7 +29,7 @@ class AdHocDB:
                                             [1]- The primary key fields for a record in that worksheet as a tuple
         '''
 
-        self.logger.info(f"Attempting to read info from Google Sheet with ID: { gs_id }")
+        log(f"Attempting to read records from Google Sheet with ID: { gs_id }")
 
         try:
             gc = gspread.service_account(CREDENTIALS_FILE_PATH)
@@ -38,9 +37,9 @@ class AdHocDB:
             for table_name, primary_keys in table_info:
                 records = spreadsheet.worksheet(table_name).get_all_records()
                 self.__add_adhoc_table(table_name, records, primary_keys)
-            self.logger.info("Succesfully read records.")
+            log("Successfully read records from Google Sheet.")
         except:
-            self.logger.error("Could not read records!", exc_info=True)
+            self.logger.error("Could not read records from Google Sheet!", exc_info=True)
             sys.exit()
 
     def __add_adhoc_table(self, table_name, records, primary_keys):

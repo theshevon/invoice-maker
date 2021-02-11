@@ -14,7 +14,7 @@ from common.date_formats import DATE_STR_FORMAT_STANDARD, DATE_STR_FORMAT_SPECIA
 from common.defaults import PDF_STORAGE_PATH
 from modules.PDFGenerator import PDFGenerator
 from modules.Mailing import Mailer
-from modules.util import recursive_dd, get_date, get_duration_in_hours, get_date_string, get_formatted_date_time
+from modules.util import recursive_dd, get_date, get_duration_in_hours, get_date_string, get_formatted_date_time, log
 
 SUBFOLDER_NAME_FORMAT = "{} to {}"
 
@@ -27,9 +27,6 @@ CREDIT_AMT = ": -${:.2f}"
 MAX_STUDENTS = 4
 
 class Invoicer:
-    '''
-        Represents a class responsible for generating invoice PDFs and emailing them.
-    '''
 
     def __init__(self):
 
@@ -58,7 +55,7 @@ class Invoicer:
         invoice_data = self.__generate_invoice_data(db, start_date, end_date, adjustments_date)
 
         if not invoice_data:
-            self.logger.info("No records found within the time bounds.")
+            log("No records found within the time bounds.")
             return
 
         if not files_only:
@@ -66,8 +63,10 @@ class Invoicer:
 
         start_date = get_date_string(start_date, DATE_STR_FORMAT_SPECIAL)
         end_date = get_date_string(end_date, DATE_STR_FORMAT_SPECIAL)
+
         subfolder_name = SUBFOLDER_NAME_FORMAT.format(start_date, end_date)
         pdf_generator = PDFGenerator(subfolder_name)
+
         n_successful_emails = 0
         for student, data in invoice_data.items():
             path_to_pdf = pdf_generator.build(curr_date, invoice_no, student, data)
@@ -98,7 +97,11 @@ class Invoicer:
                 Dictionary: A dictionary containing the info needed to generate and email the invoice PDF
         '''
 
+        log("Creating invoice data...")
+
         invoice_data = recursive_dd()
+
+        log("Adding lesson costs...")
 
         # filter records to fit time constraints
         lesson_records = self.__get_lesson_records(db, start_date, end_date)
@@ -131,6 +134,8 @@ class Invoicer:
                 for student in students_absent:
                     self.__add_student_cancellation_adjustment(db, invoice_data, student, tutor, subject, date)
 
+        log("Adding special adjustment costs...")
+
         # get adjustments costs
         adjustments_records = self.__get_adjustment_records(db, adjustments_date)
 
@@ -150,6 +155,8 @@ class Invoicer:
                 INV_COST: cost,
                 INV_REASON: reason
             })
+
+        log("Successfully created invoice data.")
 
         return invoice_data    
 

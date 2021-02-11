@@ -15,7 +15,7 @@ from common.gs_constants import GOOGLE_SHEET_ID, LESSON_SHEET_ID, LESSON_SHEET_P
 from common.date_formats import DATE_STR_FORMAT_STANDARD
 from modules.Invoicing import Invoicer
 from modules.Storage import AdHocDB
-from modules.util import determine_date_bounds, get_date
+from modules.util import determine_date_bounds, get_date, log
 
 def init():
     '''
@@ -68,17 +68,17 @@ def execute(args):
     else:
         use_prod = True
 
-    logger.info("Beginning...")
+    log("Beginning...")
 
     curr_date = datetime.now().date()
     start_date, end_date = determine_date_bounds(logger, curr_date, start_date, end_date, time_period)
 
     if end_date < curr_date and not adjustments_date:
         logger.error("The adjustments_date must be supplied when the end_date is set to a date prior to the current date")
-        logger.info("Exiting...")
+        log("Exiting...")
         return 
     elif not adjustments_date or get_date(adjustments_date, DATE_STR_FORMAT_STANDARD) > curr_date:
-        logger.info(f"Resetting adjustments date from { adjustments_date } to { curr_date }")
+        log(f"Resetting adjustments date from { adjustments_date } to { curr_date }")
         adjustments_date = curr_date
     else:
         adjustments_date = get_date(adjustments_date, DATE_STR_FORMAT_STANDARD)
@@ -97,8 +97,8 @@ def execute(args):
     n_success, n_total = invoicer.generate_and_email_invoices(db, invoice_no, curr_date, start_date, end_date, \
                                                                 adjustments_date, files_only, use_prod)
 
-    logger.info(f"{ n_success }/{ n_total } emails sent out.")
-    logger.info("Exiting...")
+    log(f"{ n_success }/{ n_total } emails sent out.")
+    log("Exiting...")
 
 if __name__ == "__main__":
     args = init()

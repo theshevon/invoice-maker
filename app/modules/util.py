@@ -101,7 +101,7 @@ def determine_date_bounds(logger, curr_date, start_date, end_date, time_period):
             end_date   (date): Upper bound for record cut off
     '''
 
-    logger.info("Attempting to determine start and end dates based on supplied values: " + \
+    log("Attempting to determine start and end dates based on supplied values: " + \
                                 f"start_date: { start_date}; end_date: { end_date }; time_period: { time_period }")
     
     try:
@@ -126,7 +126,7 @@ def determine_date_bounds(logger, curr_date, start_date, end_date, time_period):
 
         new_start_date = get_date_string(start_date, DATE_STR_FORMAT_STANDARD)
         new_end_date = get_date_string(end_date, DATE_STR_FORMAT_STANDARD)
-        logger.info(f"Updated dates: start_date: { new_start_date }; end_date: { new_end_date }")
+        log(f"Updated dates: start_date: { new_start_date }; end_date: { new_end_date }")
     
     except:
         
@@ -134,6 +134,18 @@ def determine_date_bounds(logger, curr_date, start_date, end_date, time_period):
         sys.exit()
     
     return start_date, end_date
+
+def log(msg):
+    '''
+        Prints a message to stdout in the same format as a logger would.
+        Essentially added to print INFO statements wihtout having debug mode on.
+
+        Arguments:
+            msg (string): Message that should be posted on the screen.
+    '''
+
+    curr_time = str(datetime.now())[:-3].replace('.', ',')
+    print(f"{ curr_time } [INFO]: { msg }")
 
 def recursive_dd():
     '''

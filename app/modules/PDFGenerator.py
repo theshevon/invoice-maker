@@ -14,7 +14,7 @@ from common.inv_constants import *
 from common.date_formats import DATE_STR_FORMAT_SPECIAL, DATE_TIME_STR_FORMAT_STANDARD, DATE_TIME_STR_FORMAT_SPECIAL
 from common.gs_constants import ADJUSTMENT_TYPE__DEB
 from common.defaults import PDF_STORAGE_PATH
-from modules.util import get_date, get_date_string, get_formatted_date_time, get_formatted_duration
+from modules.util import get_date, get_date_string, get_formatted_date_time, get_formatted_duration, log
 
 # path to the company logo img
 PATH_TO_LOGO = "../assets/pdf/"
@@ -109,6 +109,8 @@ class PDFGenerator:
         
         # remove temp file
         os.remove(PATH_TO_INVOICE_HTML)
+
+        log(f"Created invoice for { student } at { path_to_pdf }")
 
         return path_to_pdf
     
