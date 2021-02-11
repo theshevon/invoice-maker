@@ -13,6 +13,7 @@ from common.date_formats import DATE_STR_FORMAT_STANDARD, DATE_STR_FORMAT_SPECIA
                                 DATE_TIME_STR_FORMAT_SPECIAL
 from common.defaults import PDF_STORAGE_PATH
 from modules.PDFGenerator import PDFGenerator
+from modules.Mailing import Mailer
 from modules.util import recursive_dd, get_date, get_duration_in_hours, get_date_string, get_formatted_date_time
 
 SUBFOLDER_NAME_FORMAT = "{} to {}"
@@ -34,7 +35,8 @@ class Invoicer:
 
         self.logger = logging.getLogger(__name__)
 
-    def generate_and_email_invoices(self, db, invoice_no, curr_date, start_date, end_date, adjustments_date, files_only):
+    def generate_and_email_invoices(self, db, invoice_no, curr_date, start_date, end_date, adjustments_date, \
+                                    files_only, use_prod):
         '''
             Generates invoices and emails them to students.
 
@@ -46,6 +48,11 @@ class Invoicer:
                 end_date         (date): Upper bound (inclusive) for record cut off
                 adjustments_date (date): Date as of which adjustments are outstanding 
                 files_only       (bool): True if emailing should be skipped; False o/w
+                use_prod         (bool): True if production mail server should be used; False o/w
+
+            Returns:
+                tuple: A 2-tuple that contains, in order: [0]- The no. of emails succesfully sent out
+                                                          [1]- The no. of emails that should have been sent out
         '''
         
         invoice_data = self.__generate_invoice_data(db, start_date, end_date, adjustments_date)
@@ -54,18 +61,28 @@ class Invoicer:
             self.logger.info("No records found within the time bounds.")
             return
 
+        if not files_only:
+            mailer = Mailer(use_prod)
+
         start_date = get_date_string(start_date, DATE_STR_FORMAT_SPECIAL)
         end_date = get_date_string(end_date, DATE_STR_FORMAT_SPECIAL)
         subfolder_name = SUBFOLDER_NAME_FORMAT.format(start_date, end_date)
         pdf_generator = PDFGenerator(subfolder_name)
+        n_successful_emails = 0
         for student, data in invoice_data.items():
             path_to_pdf = pdf_generator.build(curr_date, invoice_no, student, data)
             if not files_only:
-                self.__mail_invoices(db, invoice_data)
+                email = db.getTableRecordValue(STUDENT_SHEET_ID, (student,), STUDENT_EMAIL)
+                n_successful_emails += mailer.send_email(student, email, path_to_pdf)
             invoice_no += 1
 
+        if not files_only:
+            mailer.close_mail_server_connection()
+
         if files_only:
-            return
+            return 0, 0
+
+        return n_successful_emails, len(invoice_data)
 
     def __generate_invoice_data(self, db, start_date, end_date, adjustments_date):
         '''
@@ -225,9 +242,3 @@ class Invoicer:
             INV_COST: cost,
             INV_REASON: LATE_CANCELLATION_MSG.format(subject, tutor, date, cost)
         })
-
-    def __mail_invoices(self, db, invoice_data):
-        pass
-
-    def __mail_invoice(self):
-        pass

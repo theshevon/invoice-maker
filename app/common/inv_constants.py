@@ -23,6 +23,3 @@ INV_ADJUSTMENTS = "adjustments"
 INV_TYPE = "type"
 
 INV_REASON = "reason"
-
-# path to the file containing the invoice in an html format
-INVOICE_AS_HTML = "modules/invoice.html"

@@ -63,9 +63,10 @@ def execute(args):
     logger = logging.getLogger(__name__)
 
     # determine mail server type
-    use_prod = True
     if use_prod:
         use_prod = True if use_prod == 'p' else False
+    else:
+        use_prod = True
 
     logger.info("Beginning...")
 
@@ -93,11 +94,10 @@ def execute(args):
     ])
 
     invoicer = Invoicer()
-    invoicer.generate_and_email_invoices(db, invoice_no, curr_date, start_date, end_date, adjustments_date, files_only)
+    n_success, n_total = invoicer.generate_and_email_invoices(db, invoice_no, curr_date, start_date, end_date, \
+                                                                adjustments_date, files_only, use_prod)
 
-    # n_success, n_total = send_emails(mail_data, use_prod, logger)
-
-    # logger.info(f"{ n_success }/{ n_total } emails sent out.")
+    logger.info(f"{ n_success }/{ n_total } emails sent out.")
     logger.info("Exiting...")
 
 if __name__ == "__main__":
