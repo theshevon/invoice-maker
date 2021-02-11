@@ -84,6 +84,7 @@ The following parameters can be configured in the [here](app/common/defaults.py)
 - `DEFAULT_TIME_PERIOD`
 - `OLDEST_START_DATE`
 - `PDF_STORAGE_PATH`
+- `INVOICE_PDF_NAME_ON_EMAIL`
 
 ### Environment Variables:
 

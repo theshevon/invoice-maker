@@ -16,5 +16,8 @@ DEFAULT_TIME_PERIOD = 2
 # path to folder that will store the generated PDFs
 PDF_STORAGE_PATH = "../invoices/"
 
+# Name of the invoice PDF as it appears on the email
+INVOICE_PDF_NAME_ON_EMAIL = "Invoice.pdf"
+
 # file path to google dev credentials
 CREDENTIALS_FILE_PATH = "credentials.json"

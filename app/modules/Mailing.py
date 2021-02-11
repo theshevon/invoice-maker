@@ -10,6 +10,7 @@ import smtplib
 import logging
 
 from email.message import EmailMessage
+from common.defaults import INVOICE_PDF_NAME_ON_EMAIL
 from modules.util import log 
 
 # path to the file containing the invoice in an html format
@@ -69,7 +70,7 @@ class Mailer:
             # add invoice attachment
             with open(path_to_pdf, "rb") as f:
                 content = f.read()
-                msg.add_attachment(content, maintype='application', subtype='pdf', filename='invoice.pdf')
+                msg.add_attachment(content, maintype='application', subtype='pdf', filename=INVOICE_PDF_NAME_ON_EMAIL)
 
             self.smtp.send_message(msg)
 
