@@ -9,55 +9,55 @@ Implementation of a script that will:
 
 ## Usage
 
+Before running, please ensure that you've done the following:
+- Configured the Google sheets ID in the [gs_contants.py](app/common/gs_constants.py) file
+- Added the `credentials.json` file (which contains the API KEY necessary to access the above Google Sheet) to the [app](app) directory
+- Added your mail server credentials as [environment variables](#environment-variables)
+
 ```
->>> cd clone https://github.com/theshevon/invoice-maker
 >>> cd app
->>> python3 app.py -in 0
+>>> python3 app.py
 ```
 
-The Google sheets ID must be configured in the [gs_contants.py](app/common/gs_constants.py) file. The API key will need to be added as part of a `credentials.json` file in the [app](app) directory.
+When run, you will be prompted to enter the starting invoice # for the PDFs that get generated. This input must be an **integer >= 0**.
 
 ### Available options (b/c I'm an extra bitch):
 
 - `-h` or `--help`
     - Prints out all these options and what they do
     - eg. ```>>> python3 app.py -h```
-- `-in` or `--invoice-no`
-    - Represents the invoice number for the first invoice that gets generated when the script is run
-    - This option is **mandatory**
-    - eg. ```>>> python3 app.py -in 0```
 - `-sd` or `--start-date`
     - Represents the start date for the invoicing period (inclusive)
     - When used, must be followed by a date in the format dd/mm/yy
-    - eg. ```>>> python3 app.py -in 0 -sd 25/12/20```
+    - eg. ```>>> python3 app.py -sd 25/12/20```
 - `-ed` or `--end-date`
     - Represents the end date for the invoicing period (inclusive)
     - When used, must be followed by a date in the format dd//mm/yy
     - Requires either the `-tp` or `-sd` option to also be set
-    - eg. ```>>> python3 app.py -in 0 -sd 25/12/20 -ed 11/04/21```
+    - eg. ```>>> python3 app.py -sd 25/12/20 -ed 11/04/21```
 - `-tp` or `--time-period`
     - Represents the length of the invoicing period
     - When used, must be followed by an integer number of weeks
     - Overrides the default time period
-    - eg. ```>>> python3 app.py -in 0 -tp 4```
+    - eg. ```>>> python3 app.py -tp 4```
 - `-ad` or `--adjustments-date`
     - Represents the date as of which an adjustment is outstanding. This is reflective of the `InvoiceDate` field in the Google Sheet
     - When used, must be followed by a date in the format dd/mm/yy
     - **Mandatory** when `-ed` is set to a date prior to the current date
     - Defaults to the current date when not used
-    - eg. ```>>> python3 app.py -in 0 -ed 11/04/20 -ad 10/01/21```
+    - eg. ```>>> python3 app.py -ed 11/04/20 -ad 10/01/21```
 - `-ms` or `--mail-server`
     - Represents which server to use for mailing (ie. production or test)
     - When used, must be followed by either `p` (denoting `production`) or `t` (denoting `test`)
-    - eg. ```>>> python3 app.py -in 0 -ms p```
+    - eg. ```>>> python3 app.py -ms p```
     - Defaults to `p`
 - `-fo` or `--files-only`
     - When used, skips the emailing of the generated invoice PDFs
-    - eg. ```>>> python3 app.py -in 0 -fo```
+    - eg. ```>>> python3 app.py -fo```
     - Defaults to `False` when not used
 - `-d` or `--debug`
     - When used, prints out log statements as the script executes
-    - eg. ```>>> python3 app.py -in 0 -d```
+    - eg. ```>>> python3 app.py -d```
     - Defaults to `False` when not used
 
 ### Effect of setting command line arguments

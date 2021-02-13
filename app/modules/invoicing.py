@@ -7,6 +7,7 @@
 import os
 import logging
 
+from datetime import timedelta
 from common.inv_constants import *
 from common.gs_constants import *
 from common.date_formats import DATE_STR_FORMAT_STANDARD, DATE_STR_FORMAT_SPECIAL, DATE_TIME_STR_FORMAT_STANDARD, \
@@ -67,9 +68,13 @@ class Invoicer:
         subfolder_name = SUBFOLDER_NAME_FORMAT.format(start_date, end_date)
         pdf_generator = PDFGenerator(subfolder_name)
 
+        due_date = curr_date + timedelta(weeks=1)
+        due_date = get_date_string(due_date, DATE_STR_FORMAT_SPECIAL)
+        curr_date = get_date_string(curr_date, DATE_STR_FORMAT_SPECIAL)
+
         n_successful_emails = 0
         for student, data in invoice_data.items():
-            path_to_pdf = pdf_generator.build(curr_date, invoice_no, student, data)
+            path_to_pdf = pdf_generator.build(invoice_no, curr_date, due_date, student, data)
             if not files_only:
                 email = db.getTableRecordValue(STUDENT_SHEET_ID, (student,), STUDENT_EMAIL)
                 n_successful_emails += mailer.send_email(student, email, path_to_pdf)
@@ -189,7 +194,7 @@ class Invoicer:
 
         students_as_str = students_as_str.strip()
         if students_as_str:
-            return [student.strip() for student in students_as_str.split(",")]
+            return [student.strip() for student in students_as_str.split(',')]
         return []
 
     def __get_adjustment_records(self, db, adjustments_date):

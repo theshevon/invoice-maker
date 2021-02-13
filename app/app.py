@@ -27,7 +27,6 @@ def init():
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--debug", required=False, help="debugger on", action="store_true")
-    ap.add_argument("-in", "--invoice-no", required=True, help="starting Invoice #")
     ap.add_argument("-sd", "--start-date", required=False, help="start date (dd/mm/yy)")
     ap.add_argument("-ed", "--end-date", required=False, help="end date (dd/mm/yy)")
     ap.add_argument("-tp", "--time-period", required=False, help="time period")
@@ -45,8 +44,9 @@ def execute(args):
             args (Dictionary): A map of the command line arguments and their values
     '''
 
+    print("Hello ツ\n") 
+
     # extract command line argument values
-    invoice_no = int(args["invoice_no"])
     start_date = args["start_date"]
     end_date = args["end_date"]
     time_period = args["time_period"]
@@ -68,6 +68,20 @@ def execute(args):
     else:
         use_prod = True
 
+    # get starting invoice #
+    while True:
+        try:
+            invoice_no = input("Please enter the starting Invoice #: ")
+            invoice_no = int(invoice_no)
+            if invoice_no >= 0: 
+                print()
+                break
+            else:
+                print("The Invoice # must be an *integer* >= 0!")
+        except:
+            print("The Invoice # must be an integer >= 0!")
+            continue
+    
     log("Beginning...")
 
     curr_date = datetime.now().date()
@@ -99,6 +113,8 @@ def execute(args):
 
     log(f"{ n_success }/{ n_total } emails sent out.")
     log("Exiting...")
+
+    print("\nBye! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
 
 if __name__ == "__main__":
     args = init()

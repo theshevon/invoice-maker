@@ -51,13 +51,14 @@ class PDFGenerator:
         except FileExistsError:
             self.logger.info(f"Directory already exists at: { self.path_to_subfolder }")
 
-    def build(self, curr_date, invoice_no, student, invoice_info):
+    def build(self, invoice_no, curr_date, due_date, student, invoice_info):
         '''
             Builds a pdf.
 
             Arguments:
-                curr_date          (date): The current date
                 invoice_no          (int): The invoice no. for the PDF that gets generated
+                curr_date        (string): The current date (formatted)
+                due_date         (string): The due date (formatted)   
                 student          (string): The name of the student who the invoice is for
                 invoice_info (Dictionary): A dictionary containing all the info needed for the PDF generation
             
@@ -97,8 +98,7 @@ class PDFGenerator:
 
         # fill up invoice
         invoice_no = f"{invoice_no:06}"
-        curr_date = get_date_string(curr_date, DATE_STR_FORMAT_SPECIAL)
-        invoice = self.PDF_TEMPLATE.format(PATH_TO_LOGO, invoice_no, curr_date, curr_date, student, billing_rows, subtotal, adjustments_total, total, notes, True)
+        invoice = self.PDF_TEMPLATE.format(PATH_TO_LOGO, invoice_no, curr_date, due_date, student, billing_rows, subtotal, adjustments_total, total, notes, True)
         
         # make temp invoice as html
         with open(PATH_TO_INVOICE_HTML, "w") as f:
