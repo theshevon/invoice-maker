@@ -5,10 +5,10 @@
 '''
 
 from datetime import datetime
-from common.date_formats import DATE_STR_FORMAT_STANDARD
+from common.date_formats import DATE_STR_FORMAT_CL
 
 # oldest possible start date
-OLDEST_START_DATE = datetime.strptime("11/04/1998", DATE_STR_FORMAT_STANDARD).date()
+OLDEST_START_DATE = datetime.strptime("11/04/98", DATE_STR_FORMAT_CL).date()
 
 # default time period to generate invoices over (in weeks)
 DEFAULT_TIME_PERIOD = 2

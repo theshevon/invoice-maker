@@ -11,7 +11,7 @@ DATE_TIME_STR_FORMAT_STANDARD = "%d/%m/%Y %H:%M:%S"
 DATE_STR_FORMAT_STANDARD = "%d/%m/%Y"
 
 # command line date string format (eg. "25/12/20")
-DATE_STR_FORMAT_CL = "%d/%m/%Y"
+DATE_STR_FORMAT_CL = "%d/%m/%y"
 
 # special date string format (eg. "12 Jan 2021")
 DATE_STR_FORMAT_SPECIAL = "%d %b %Y"
