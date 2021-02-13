@@ -15,7 +15,7 @@ from common.gs_constants import GOOGLE_SHEET_ID, LESSON_SHEET_ID, LESSON_SHEET_P
 from common.date_formats import DATE_STR_FORMAT_STANDARD
 from modules.Invoicing import Invoicer
 from modules.Storage import AdHocDB
-from modules.util import determine_date_bounds, get_date, log
+from modules.util import determine_date_bounds, get_date_string, get_date, log
 
 def init():
     '''
@@ -92,7 +92,7 @@ def execute(args):
         log("Exiting...")
         return 
     elif not adjustments_date or get_date(adjustments_date, DATE_STR_FORMAT_STANDARD) > curr_date:
-        log(f"Resetting adjustments date from { adjustments_date } to { curr_date }")
+        log(f"Resetting adjustments date from { adjustments_date } to { get_date_string(curr_date, DATE_STR_FORMAT_STANDARD) }")
         adjustments_date = curr_date
     else:
         adjustments_date = get_date(adjustments_date, DATE_STR_FORMAT_STANDARD)
