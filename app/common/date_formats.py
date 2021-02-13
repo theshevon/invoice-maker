@@ -16,5 +16,5 @@ DATE_STR_FORMAT_CL = "%d/%m/%y"
 # special date string format (eg. "12 Jan 2021")
 DATE_STR_FORMAT_SPECIAL = "%d %b %Y"
 
-# specialdate time string format (eg. "12:00pm on 12 Jan 2021")
+# special date time string format (eg. "12:00pm on 12 Jan 2021")
 DATE_TIME_STR_FORMAT_SPECIAL = "%I:%M%p on %d %b %Y"
