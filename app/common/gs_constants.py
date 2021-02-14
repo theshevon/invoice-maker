@@ -1,5 +1,5 @@
 '''
-:name: defaults.py
+:name: gs_constants.py
 :author: Shevon Mendis <shevonmendis@gmail.com>
 :purpose: To store all the field names/ keys for the sheets in the Google sheet.
 '''

@@ -3,9 +3,10 @@
 ## Description 
 
 Implementation of a script that will:
-- Read student records off of a Google Sheet (for a specified time period)
-- Generate PDF invoices (based on a pre-configured template)
-- Email each of the PDF invoices to the required contact
+- Read information from a Google Sheet
+- Convert it into a processable format
+- Generate Invoice PDFs 
+- Email the generated Invoice PDFs
 
 ## Usage
 
@@ -13,6 +14,7 @@ Before running, please ensure that you've done the following:
 - Configured the Google sheets ID in the [gs_contants.py](app/common/gs_constants.py) file
 - Added the `credentials.json` file (which contains the API KEY necessary to access the above Google Sheet) to the [app](app) directory
 - Added your mail server credentials as [environment variables](#environment-variables)
+- Installed the necessary `python` dependencies
 
 ```
 >>> cd app
@@ -54,24 +56,22 @@ When run, you will be prompted to enter the starting invoice # for the PDFs that
 - `-fo` or `--files-only`
     - When used, skips the emailing of the generated invoice PDFs
     - eg. ```>>> python3 app.py -fo```
-    - Defaults to `False` when not used
 - `-d` or `--debug`
     - When used, prints out log statements as the script executes
     - eg. ```>>> python3 app.py -d```
-    - Defaults to `False` when not used
 
 ### Effect of setting command line arguments
 
 -sd | -ed | -tp | Result
 ----| ----| ----|-----
-☑️ | ☑️ | ☑️ | Start and end dates provided are used as bounds; Time period is ignored
-☑️ | ☑️ | ☐ | Start and end dates provided are used as bounds; Time period is ignored
+☑️ | ☑️ | ☑️ | Start Date and End Date provided are used as bounds; Time period is ignored
+☑️ | ☑️ | ☐ | Start Date and End Date provided are used as bounds
 ☑️ | ☐ | ☑️ | End Date set to (Start Date + Time period)
-☑️ | ☐ | ☐ | End Date set to current date
-☐ | ☑️ | ☑️ | Start date set to (End date - Time Period)
-☐ | ☑️ | ☐ | Start date set to `OLDEST_START_DATE` 
-☐ | ☐ | ☑️ | Start date set to (current date - Time period); End date set to current date
-☐ | ☐ | ☐ | Start date set to (current date - `DEFAULT_TIME_PERIOD`); End date set to current date
+☑️ | ☐ | ☐ | End Date set to Current Date
+☐ | ☑️ | ☑️ | Start Date set to (End Date - Time Period)
+☐ | ☑️ | ☐ | Start Date set to `OLDEST_START_DATE` 
+☐ | ☐ | ☑️ | Start Date set to (Current Date - Time Period); End Date set to Current Date
+☐ | ☐ | ☐ | Start Date set to (Current Date - `DEFAULT_TIME_PERIOD`); End Date set to Current Date
 
 **Important**: When the `-ms` flag is set to `t`, the script will log the email information to a local debugging server. This will need to be run prior to running the script, and can be done so by executing the following command:
 ```
@@ -79,7 +79,7 @@ When run, you will be prompted to enter the starting invoice # for the PDFs that
 ```  
 ### Defaults:
 
-The following parameters can be configured in the [here](app/common/defaults.py):
+The following parameters can be configured [here](app/common/defaults.py):
 
 - `DEFAULT_TIME_PERIOD`
 - `OLDEST_START_DATE`

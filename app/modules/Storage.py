@@ -32,17 +32,28 @@ class AdHocDB:
         log(f"Attempting to read records from Google Sheet with ID: { gs_id }")
 
         try:
+            
             gc = gspread.service_account(CREDENTIALS_FILE_PATH)
             spreadsheet = gc.open_by_key(gs_id)
+            
             for table_name, primary_keys in table_info:
                 records = spreadsheet.worksheet(table_name).get_all_records()
-                self.__add_adhoc_table(table_name, records, primary_keys)
+                
+                # trim trailing spaces off of (str) values
+                for record in records:
+                    for key in record:
+                        if (isinstance(record[key], str)):
+                            record[key] = record[key].strip()
+                            
+                self.__add_table(table_name, records, primary_keys)
+            
             log("Successfully read records from Google Sheet.")
         except:
             self.logger.error("Could not read records from Google Sheet!", exc_info=True)
             sys.exit()
 
-    def __add_adhoc_table(self, table_name, records, primary_keys):
+
+    def __add_table(self, table_name, records, primary_keys):
         '''
             Creates a table in the ad hoc DB.
 
@@ -54,9 +65,7 @@ class AdHocDB:
 
         table = {}
         for record in records:    
-            key = tuple()
-            for primary_key in primary_keys:
-                key += (record[primary_key], )
+            key = tuple(record[primary_key] for primary_key in primary_keys)
             table[key] = record
 
         self.tables[table_name] = table
