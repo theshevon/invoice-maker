@@ -57,7 +57,7 @@ class Invoicer:
 
         if not invoice_data:
             log("No records found within the time bounds.")
-            return
+            return 0, 0
 
         if not files_only:
             mailer = Mailer(use_prod)
